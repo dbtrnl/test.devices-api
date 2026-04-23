@@ -16,7 +16,7 @@ func SetupRoutes(r *gin.Engine, c *deps.Container) error {
     uc := usecase.NewDeviceService(repo)
     h := handler.NewDeviceHandler(uc)
 
-    r.GET("/devices/:id", h.GetDevice)
+    r.GET("/devices/:external_id", h.GetByExternalID)
 
     return nil
 }
