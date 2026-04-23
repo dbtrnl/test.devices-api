@@ -8,15 +8,26 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/dbtrnl/test.devices-api/internal/infra/logger"
+	"github.com/dbtrnl/test.devices-api/internal/infra/deps"
 	"github.com/dbtrnl/test.devices-api/internal/infra/server"
+	"github.com/dbtrnl/test.devices-api/pkg/logger"
 )
 
 func main() {
 	logger.Init()
 	logger.Info("starting server...")
 
-	srv := server.New()
+	c, err := deps.NewContainer()
+	if err != nil {
+		logger.Error(fmt.Sprintf("failed to initialize container: %v", err))
+		os.Exit(1)
+	}
+
+	srv, err := server.New(c)
+	if err != nil {
+		logger.Error(fmt.Sprintf("failed to initialize gin server: %v", err))
+		os.Exit(1)
+	}
 
 	go func() {
 		if err := srv.Start(); err != nil {

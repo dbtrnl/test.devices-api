@@ -1,36 +1,53 @@
-package server
+package deps
 
 import (
 	"fmt"
 	"sync"
 
-	"github.com/dbtrnl/test.devices-api/internal/infra/config"
-	"github.com/dbtrnl/test.devices-api/internal/infra/logger"
+	"github.com/dbtrnl/test.devices-api/pkg/config"
+	"github.com/dbtrnl/test.devices-api/pkg/logger"
 	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-var (
-	dbInstance *gorm.DB
-	once       sync.Once
-)
-
-func (s *Server) GetDbConn() (*gorm.DB, error) {
-	var err error
-	once.Do(func() {
-		dbInstance, err = s.initDbConn()
-	})
-	return dbInstance, err
+type Container struct {
+	Config *config.EnvConfig
+	DB     *gorm.DB
 }
 
-func (s *Server) initDbConn() (*gorm.DB, error) {
-	var sslDisable string
+var (
+	instance *Container
+	once     sync.Once
+	initErr  error
+)
 
+func NewContainer() (*Container, error) {
+	once.Do(func() {
+		instance, initErr = newContainerInstance()
+	})
+	return instance, initErr
+}
+
+func newContainerInstance() (*Container, error) {
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		return nil, fmt.Errorf("failed to load config: %w", err)
 	}
+
+	db, err := initDbConn(&cfg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize database: %w", err)
+	}
+
+	return &Container{
+		Config: &cfg,
+		DB:     db,
+	}, nil
+}
+
+func initDbConn(cfg *config.EnvConfig) (*gorm.DB, error) {
+	var sslDisable string
 
 	// SSL disabled on local env since this is a take-home coding exercise. Also used to make tests easier.
 	// // This obviously would never be used in production.

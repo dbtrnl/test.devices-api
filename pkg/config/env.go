@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/dbtrnl/test.devices-api/internal/infra/logger"
+	"github.com/dbtrnl/test.devices-api/pkg/logger"
 	"github.com/joho/godotenv"
 )
 
