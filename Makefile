@@ -35,7 +35,7 @@ clean:
 	rm -rf $(BIN_PATH)
 
 clean-db:
-	docker compose down postgres
+	docker compose down -v
 
 init-db: clean-db
 	docker compose up postgres -d

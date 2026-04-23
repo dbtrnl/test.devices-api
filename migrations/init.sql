@@ -16,15 +16,15 @@ CREATE INDEX IF NOT EXISTS idx_devices_brand ON devices(brand) WHERE is_deleted 
 CREATE INDEX IF NOT EXISTS idx_devices_state ON devices(state) WHERE is_deleted = FALSE;
 -- Test devices
 INSERT INTO devices (external_id, name, brand, state) 
-VALUES ('22a2a22a-2a2a-4777-2a77-a222222a7a111','Test device 1', 'Brand number one', 'available');
+VALUES ('77b85ecb-e767-4f2d-a3cf-be53dae49274','Test device 1', 'Brand number one', 'available');
 INSERT INTO devices (external_id, name, brand, state) 
-VALUES ('22a2a22a-2a2a-4777-2a77-a222222a7a222','Test device 2', 'Brand number one', 'in-use');
+VALUES ('f3b4ea8f-1e69-4736-9cc7-f8775761fefd','Test device 2', 'Brand number one', 'in-use');
 INSERT INTO devices (external_id, name, brand, state) 
-VALUES ('22a2a22a-2a2a-4777-2a77-a222222a7a333','Test device 3', 'Brand number two', 'inactive');
+VALUES ('c343dabd-0afd-4f5b-a632-42be259df112','Test device 3', 'Brand number two', 'inactive');
 INSERT INTO devices (external_id, name, brand, state) 
-VALUES ('22a2a22a-2a2a-4777-2a77-a222222a7a444','Test device 4', 'Brand number two', 'available');
+VALUES ('881ff09c-4ac4-43e7-9301-263e0f930273','Test device 4', 'Brand number two', 'available');
 INSERT INTO devices (external_id, name, brand, state) 
-VALUES ('22a2a22a-2a2a-4777-2a77-a222222a7a555','Test device 5', 'Brand number three', 'available');
+VALUES ('4e579ef0-0cd8-459c-bfa5-3470802bab0c','Test device 5', 'Brand number three', 'available');
 
 
 /* 

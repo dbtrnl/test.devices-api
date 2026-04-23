@@ -34,7 +34,6 @@ func LoadConfig() (EnvConfig, error) {
 
 	if err := loadEnvFile(env); err != nil {
 		logger.Info("no env file found, using default local environment variables...")
-		return EnvConfig{}, nil
 	}
 
 	defaultEnv := EnvConfig{
