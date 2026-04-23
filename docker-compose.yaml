@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: devices_db
+    environment:
+      POSTGRES_USER: devices_api
+      POSTGRES_PASSWORD: devices_api
+      POSTGRES_DB: devices_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devices_api -d devices_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - devices_network
+
+  api:
+    build: .
+    container_name: devices_api
+    environment:
+      ENV: local
+      PORT: 8080
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: devices_api
+      DB_PASSWORD: devices_api
+      DB_NAME: devices_db
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - devices_network
+
+volumes:
+  postgres_data:
+
+networks:
+  devices_network:
+    driver: bridge

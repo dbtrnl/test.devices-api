@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug compiled binary",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/cmd/api",
+            "env": {
+                "ENV": "local",
+                "PORT": "8080",
+                "DB_HOST": "localhost",
+                "DB_PORT": "5432",
+                "DB_USER": "devices_api",
+                "DB_PASSWORD": "devices_api",
+                "DB_NAME": "devices_db"
+            },
+            "preLaunchTask": "Compile and run",
+            "console": "internalConsole"
+        }
+    ]
+}
