@@ -16,7 +16,7 @@
                 "DB_PASSWORD": "devices_api",
                 "DB_NAME": "devices_db"
             },
-            "preLaunchTask": "Compile",
+            "preLaunchTask": "Start Database",
             "console": "internalConsole"
         }
     ]

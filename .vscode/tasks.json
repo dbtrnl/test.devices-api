@@ -16,20 +16,6 @@
                 "panel": "shared"
             },
             "problemMatcher": []
-        },
-        {
-            "label": "Compile",
-            "type": "shell",
-            "command": "go",
-            "dependsOn": [
-                "Start Database"
-            ],
-            "args": [
-                "build",
-                "-o",
-                "bin/api",
-                "./cmd/api"
-            ]
         }
     ]
 }
