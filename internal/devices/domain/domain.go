@@ -1,5 +1,7 @@
 package domain
 
+import "time"
+
 const (
 	DeviceStateActive   DeviceState = "active"
 	DeviceStateInactive DeviceState = "inactive"
@@ -7,14 +9,15 @@ const (
 )
 
 type Device struct {
-	ID         string      `json:"id"`
-	ExternalID string      `json:"external_id"`
-	Name       string      `json:"name"`
-	Brand      string      `json:"brand"`
-	State      DeviceState `json:"state"`
-	CreatedAt  string      `json:"created_at"`
-	UpdatedAt  string      `json:"updated_at,omitzero"`
-	DeletedAt  string      `json:"deleted_at,omitzero"`
+	ID         uint64
+	ExternalID string
+	Name       string
+	Brand      string
+	State      DeviceState
+	IsDeleted  bool
+	CreatedAt  time.Time
+	UpdatedAt  *time.Time
+	DeletedAt  *time.Time
 }
 type DeviceState string
 

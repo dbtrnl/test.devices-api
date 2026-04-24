@@ -1,7 +1,7 @@
 package buildinfo
 
 var (
-	Version   = "unset - if you're seeing this, the build is broken"
-	Commit    = "unset - if you're seeing this, the build is broken"
-	BuildTime = "unset - if you're seeing this, the build is broken"
+	Version   = "variable unset - you should only see this on local debugging, not on any other environments"
+	Commit    = "variable unset - you should only see this on local debugging, not on any other environments"
+	BuildTime = "variable unset - you should only see this on local debugging, not on any other environments"
 )

@@ -17,6 +17,7 @@ func SetupRoutes(r *gin.Engine, c *deps.Container) error {
     h := handler.NewDeviceHandler(uc)
 
     r.GET("/devices/:external_id", h.GetByExternalID)
+    r.POST("devices", h.Create)
 
     return nil
 }
