@@ -4,37 +4,34 @@ import (
 	"net/http"
 
 	"github.com/dbtrnl/test.devices-api/internal/devices/dto"
+	"github.com/dbtrnl/test.devices-api/internal/infra/http/request"
+	"github.com/dbtrnl/test.devices-api/internal/infra/http/response"
 	"github.com/gin-gonic/gin"
 )
 
+// Validation such as this one was avoided.
+// State *string `form:"state" binding:"omitempty,oneof=available in-use inactive"`
+// This is deliberate, to keep the logic explicit inside the DTO code.
 type listDevicesQuery struct {
-	Brand *string `json:"brand"`
-	State *string `json:"state"`
+	Brand *string `form:"brand"`
+	State *string `form:"state"`
 }
 
 func (h *DeviceHandler) List(c *gin.Context) {
 	var req listDevicesQuery
 
-	if err := c.ShouldBindQuery(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid query params",
-		})
+	if !request.BindQuery(c, &req) {
 		return
 	}
 
 	input, err := dto.NewListDeviceInput(req.Brand, req.State)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+	if !response.HandleValidationError(c, err) {
 		return
 	}
 
 	devices, err := h.svc.List(c.Request.Context(), input)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to list devices",
-		})
+		response.HandleError(c, err, listDevicesErrMap)
 		return
 	}
 

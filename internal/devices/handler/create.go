@@ -3,8 +3,9 @@ package handler
 import (
 	"net/http"
 
-	"github.com/dbtrnl/test.devices-api/internal/devices/domain"
 	"github.com/dbtrnl/test.devices-api/internal/devices/dto"
+	"github.com/dbtrnl/test.devices-api/internal/infra/http/request"
+	"github.com/dbtrnl/test.devices-api/internal/infra/http/response"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,33 +18,18 @@ type createDeviceRequest struct {
 func (h *DeviceHandler) Create(c *gin.Context) {
 	var req createDeviceRequest
 
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "invalid request", // Change for a constant
-			"details": err.Error(),
-		})
+	if !request.BindJSON(c, &req) {
 		return
 	}
 
 	input, err := dto.NewCreateDeviceInput(req.Name, req.Brand, req.State)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+	if !response.HandleValidationError(c, err) {
 		return
 	}
 
 	created, err := h.svc.Create(c.Request.Context(), input)
 	if err != nil {
-		if domain.IsErrorCode(err, domain.ErrDeviceExistsDeleted) {
-			c.JSON(http.StatusConflict, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to create device",
-		})
+		response.HandleError(c, err, createDeviceErrMap)
 		return
 	}
 

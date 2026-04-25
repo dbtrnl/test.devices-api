@@ -1,14 +1,19 @@
 package handler
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
+
+	"github.com/dbtrnl/test.devices-api/internal/infra/http/response"
+	"github.com/gin-gonic/gin"
+)
 
 func (h *DeviceHandler) GetByExternalID(c *gin.Context) {
 	external_id := c.Param("external_id")
 
 	device, err := h.svc.GetByExternalID(c, external_id)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		response.HandleError(c, err, getByExternalIDErrMap)
 		return
 	}
-	c.JSON(200, device)
+	c.JSON(http.StatusCreated, device)
 }
