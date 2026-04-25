@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/dbtrnl/test.devices-api/internal/devices/domain"
+	"github.com/jackc/pgx/v5/pgconn"
 	"gorm.io/gorm"
 )
 
@@ -57,18 +58,42 @@ func (r *deviceRepository) Create(ctx context.Context, device *domain.Device) (*
 	return device, nil
 }
 
-// func (r *deviceRepository) List(ctx context.Context, filter domain.DeviceFilter) ([]domain.Device, error) {
-//     var devices []domain.Device
-//     db := r.db.WithContext(ctx).Model(&domain.Device{})
+func (r *deviceRepository) List(ctx context.Context, filter domain.DeviceFilter) ([]domain.Device, error) {
+	var devices []domain.Device
+	db := r.db.WithContext(ctx).Model(&domain.Device{})
 
-//     if filter.Brand != nil {
-//         db = db.Where("brand = ?", *filter.Brand)
-//     }
-//     if filter.State != nil {
-//         db = db.Where("state = ?", *filter.State)
-//     }
-//     if err := db.Find(&devices).Error; err != nil {
-//         return nil, err
-//     }
-//     return devices, nil
-// }
+	if filter.Brand != nil {
+		db = db.Where("brand = ?", *filter.Brand)
+	}
+	if filter.State != nil {
+		db = db.Where("state = ?", *filter.State)
+	}
+	if err := db.Find(&devices).Error; err != nil {
+		return nil, err
+	}
+	return devices, nil
+}
+
+func (r *deviceRepository) DeleteByExternalID(ctx context.Context, externalID string) error {
+	result := r.db.WithContext(ctx).Debug().
+		Model(&domain.Device{}).
+		Where("external_id = ? AND is_deleted = FALSE", externalID).
+		Updates(map[string]any{
+			"is_deleted": true,
+		})
+	if result.Error != nil {
+		var pgErr *pgconn.PgError
+
+		if errors.As(result.Error, &pgErr) {
+			if pgErr.Message == string(domain.ErrDeviceInUse) {
+				return domain.NewDeviceInUseError(externalID)
+			}
+		}
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return domain.NewDeviceNotFoundError(externalID)
+	}
+
+	return nil
+}

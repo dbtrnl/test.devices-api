@@ -16,7 +16,3 @@ func (s *DeviceService) Create(ctx context.Context, input dto.CreateDeviceInput)
 
 	return s.repo.Create(ctx, device)
 }
-
-// func (s *DeviceService) Create(ctx context.Context, device dto.CreateDeviceInput) (*domain.Device, error) {
-//     return s.repo.Create(ctx, device)
-// }

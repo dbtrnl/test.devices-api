@@ -3,9 +3,9 @@ package domain
 import "time"
 
 const (
-	DeviceStateActive   DeviceState = "active"
-	DeviceStateInactive DeviceState = "inactive"
-	DeviceStateInUse    DeviceState = "in_use"
+	DeviceStateAvailable DeviceState = "available"
+	DeviceStateInactive  DeviceState = "inactive"
+	DeviceStateInUse     DeviceState = "in-use"
 )
 
 type Device struct {
@@ -35,8 +35,17 @@ func (d Device) IsInUse() bool {
 
 type DeviceFilter struct {
 	Brand *string
-	State *string
+	State *DeviceState
 
 	Limit  *int
 	Offset *int
+}
+
+func IsValidDeviceState(s string) bool {
+	switch DeviceState(s) {
+	case DeviceStateAvailable, DeviceStateInUse, DeviceStateInactive:
+		return true
+	default:
+		return false
+	}
 }

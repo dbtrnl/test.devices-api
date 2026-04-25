@@ -23,7 +23,7 @@ CREATE OR REPLACE FUNCTION prevent_created_at_update()
 RETURNS TRIGGER AS $$
 BEGIN
     IF NEW.created_at IS DISTINCT FROM OLD.created_at THEN
-        RAISE EXCEPTION 'created_at cannot be updated after creation';
+        RAISE EXCEPTION USING MESSAGE = 'err_device_created_date_cannot_be_altered', ERRCODE = 'P1002';
     END IF;
     RETURN NEW;
 END;
@@ -34,7 +34,7 @@ CREATE OR REPLACE FUNCTION prevent_device_inuse_update()
 RETURNS TRIGGER AS $$
 BEGIN
     IF OLD.state = 'in-use' THEN
-        RAISE EXCEPTION 'Cannot update device while it is in use';
+        RAISE EXCEPTION USING MESSAGE = 'err_device_in_use', ERRCODE = 'P1001';
     END IF;
     RETURN NEW;
 END;
@@ -45,7 +45,7 @@ CREATE OR REPLACE FUNCTION handle_device_deletion()
 RETURNS TRIGGER AS $$
 BEGIN
     IF OLD.state = 'in-use' AND NEW.is_deleted = TRUE THEN
-        RAISE EXCEPTION 'Cannot delete device while it is in use';
+        RAISE EXCEPTION USING MESSAGE = 'err_device_in_use', ERRCODE = 'P1001';
     END IF;
 
     IF NEW.is_deleted = TRUE AND OLD.is_deleted = FALSE THEN
@@ -70,5 +70,8 @@ VALUES
     ('c343dabd-0afd-4f5b-a632-42be259df112','Test device 3', 'Brand number one', 'inactive', false),
     ('881ff09c-4ac4-43e7-9301-263e0f930273','Test device 4', 'Brand number two', 'available', false),
     ('4e579ef0-0cd8-459c-bfa5-3470802bab0c','Test device 5', 'Brand number two', 'inactive', false),
-    ('d3f32eba-fc67-4440-b054-1cf821042610','Test device 6', 'Brand number two', 'in-use', false),
-    ('3c46c5a3-4fa9-4ce1-8693-12e467f03730','Test device 7 (soft deleted)', 'Brand number three', 'available', true);
+    ('d3f32eba-fc67-4440-b054-1cf821042610','Test device 6', 'Brand number two', 'in-use', false);
+
+INSERT INTO devices (external_id, name, brand, state, updated_at, is_deleted, deleted_at)
+VALUES
+    ('3c46c5a3-4fa9-4ce1-8693-12e467f03730','Test device 7 (soft deleted)', 'Brand number three', 'available', '2026-02-02 14:14:14+00', true, '2026-02-02 14:14:14+00');

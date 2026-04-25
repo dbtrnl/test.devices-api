@@ -5,12 +5,22 @@ import (
 	"time"
 
 	"github.com/dbtrnl/test.devices-api/internal/devices/domain"
+	"github.com/google/uuid"
 )
 
 type CreateDeviceInput struct {
 	Name  string
 	Brand string
 	State domain.DeviceState
+}
+
+type DeleteDeviceInput struct {
+	ExternalID string
+}
+
+type ListDevicesInput struct {
+	Brand *string
+	State *domain.DeviceState
 }
 
 type DeviceResponse struct {
@@ -21,7 +31,8 @@ type DeviceResponse struct {
 	State      string  `json:"state"`
 	CreatedAt  string  `json:"created_at"`
 	UpdatedAt  *string `json:"updated_at,omitempty"`
-	IsDeleted  bool    `json:"deleted_at,omitempty"`
+	DeletedAt  *string `json:"deleted_at,omitempty"`
+	IsDeleted  bool    `json:"is_deleted,omitempty"`
 }
 
 func NewCreateDeviceInput(name, brand, state string) (CreateDeviceInput, error) {
@@ -46,11 +57,46 @@ func NewCreateDeviceInput(name, brand, state string) (CreateDeviceInput, error) 
 	}, nil
 }
 
+func NewListDeviceInput(brand, state *string) (ListDevicesInput, error) {
+	var input ListDevicesInput
+
+	if brand != nil {
+		input.Brand = brand
+	}
+
+	if state != nil {
+		if !domain.IsValidDeviceState(*state) {
+			return ListDevicesInput{}, fmt.Errorf("invalid state: %s", *state)
+		}
+
+		s := domain.DeviceState(*state)
+		input.State = &s
+	}
+
+	return input, nil
+}
+
+func NewDeleteDeviceInput(uuidStr string) (DeleteDeviceInput, error) {
+	err := uuid.Validate(uuidStr)
+	if err != nil {
+		return DeleteDeviceInput{}, fmt.Errorf("invalid uuid: %s", uuidStr)
+	}
+
+	return DeleteDeviceInput{
+		ExternalID: uuidStr,
+	}, nil
+}
+
 func ToDeviceResponse(d *domain.Device) DeviceResponse {
-	var updatedAt *string
+	var updatedAt, deletedAt *string
 	if d.UpdatedAt != nil {
 		s := d.UpdatedAt.UTC().Format(time.RFC3339)
 		updatedAt = &s
+	}
+
+	if d.DeletedAt != nil {
+		del := d.DeletedAt.UTC().Format(time.RFC3339)
+		deletedAt = &del
 	}
 
 	return DeviceResponse{
@@ -61,5 +107,6 @@ func ToDeviceResponse(d *domain.Device) DeviceResponse {
 		State:      string(d.State),
 		CreatedAt:  d.CreatedAt.UTC().Format(time.RFC3339),
 		UpdatedAt:  updatedAt,
+		DeletedAt:  deletedAt,
 	}
 }

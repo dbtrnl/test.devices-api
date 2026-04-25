@@ -10,23 +10,25 @@ import (
 )
 
 func SetupRoutes(r *gin.Engine, c *deps.Container) error {
-    r.GET("/health", health)
+	r.GET("/health", health)
 
-    repo := repository.NewDeviceRepository(c.DB)
-    uc := usecase.NewDeviceService(repo)
-    h := handler.NewDeviceHandler(uc)
+	repo := repository.NewDeviceRepository(c.DB)
+	uc := usecase.NewDeviceService(repo)
+	h := handler.NewDeviceHandler(uc)
 
-    r.GET("/devices/:external_id", h.GetByExternalID)
-    r.POST("devices", h.Create)
+	r.GET("/devices", h.List)
+	r.GET("/devices/:external_id", h.GetByExternalID)
+	r.DELETE("/devices/:external_id", h.DeleteByExternalID)
+	r.POST("/devices", h.Create)
 
-    return nil
+	return nil
 }
 
 func health(c *gin.Context) {
-    c.JSON(200, gin.H{
-        "status":    "ok",
-        "version":   buildinfo.Version,
-        "commit":    buildinfo.Commit,
-        "buildTime": buildinfo.BuildTime,
-    })
+	c.JSON(200, gin.H{
+		"status":    "ok",
+		"version":   buildinfo.Version,
+		"commit":    buildinfo.Commit,
+		"buildTime": buildinfo.BuildTime,
+	})
 }
