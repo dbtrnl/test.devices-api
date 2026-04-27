@@ -63,7 +63,7 @@ func loadEnvFile(env string) error {
 		msg := fmt.Sprintf("could not load %s: %v", filename, err)
 		logger.Info(msg)
 
-		return fmt.Errorf(msg)
+		return fmt.Errorf("%s", msg)
 	}
 
 	return nil

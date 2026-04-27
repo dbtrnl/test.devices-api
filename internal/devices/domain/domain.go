@@ -41,6 +41,13 @@ type DeviceFilter struct {
 	Offset *int
 }
 
+type UpdateDevice struct {
+	ExternalID string
+	Name       string
+	Brand      string
+	State      DeviceState
+}
+
 func IsValidDeviceState(s string) bool {
 	switch DeviceState(s) {
 	case DeviceStateAvailable, DeviceStateInUse, DeviceStateInactive:

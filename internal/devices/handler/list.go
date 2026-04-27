@@ -9,9 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Validation such as this one was avoided.
-// State *string `form:"state" binding:"omitempty,oneof=available in-use inactive"`
-// This is deliberate, to keep the logic explicit inside the DTO code.
+// Tag validations were avoided to keep the logic explicit inside the DTO
 type listDevicesQuery struct {
 	Brand *string `form:"brand"`
 	State *string `form:"state"`

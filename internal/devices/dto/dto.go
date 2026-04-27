@@ -23,6 +23,13 @@ type ListDevicesInput struct {
 	State *domain.DeviceState
 }
 
+type UpdateDeviceInput struct {
+	ExternalID string
+	Name       *string
+	Brand      *string
+	State      *domain.DeviceState
+}
+
 type DeviceResponse struct {
 	ID         uint64  `json:"id"`
 	ExternalID string  `json:"external_id"`
@@ -39,12 +46,10 @@ func NewCreateDeviceInput(name, brand, state string) (CreateDeviceInput, error) 
 	if len(name) < 2 {
 		return CreateDeviceInput{}, fmt.Errorf("name must be at least 2 characters")
 	}
-
 	if len(brand) < 2 {
 		return CreateDeviceInput{}, fmt.Errorf("brand must be at least 2 characters")
 	}
 
-	// default state
 	deviceState := domain.DeviceState(state)
 	if deviceState == "" {
 		deviceState = domain.DeviceStateInactive
@@ -63,7 +68,6 @@ func NewListDeviceInput(brand, state *string) (ListDevicesInput, error) {
 	if brand != nil {
 		input.Brand = brand
 	}
-
 	if state != nil {
 		if !domain.IsValidDeviceState(*state) {
 			return ListDevicesInput{}, fmt.Errorf("invalid state: %s", *state)
@@ -85,6 +89,36 @@ func NewDeleteDeviceInput(uuidStr string) (DeleteDeviceInput, error) {
 	return DeleteDeviceInput{
 		ExternalID: uuidStr,
 	}, nil
+}
+
+func NewUpdateDeviceInput(externalID string, name, brand, state *string) (UpdateDeviceInput, error) {
+	input := UpdateDeviceInput{
+		ExternalID: externalID,
+	}
+
+	if name != nil {
+		if len(*name) < 2 {
+			return UpdateDeviceInput{}, fmt.Errorf("name must be at least 2 characters")
+		}
+		input.Name = name
+	}
+
+	if brand != nil {
+		if len(*brand) < 2 {
+			return UpdateDeviceInput{}, fmt.Errorf("brand must be at least 2 characters")
+		}
+		input.Brand = brand
+	}
+
+	if state != nil {
+		if !domain.IsValidDeviceState(*state) {
+			return UpdateDeviceInput{}, fmt.Errorf("invalid state: %s", *state)
+		}
+		s := domain.DeviceState(*state)
+		input.State = &s
+	}
+
+	return input, nil
 }
 
 func ToDeviceResponse(d *domain.Device) DeviceResponse {

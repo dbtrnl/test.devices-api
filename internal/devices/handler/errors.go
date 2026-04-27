@@ -8,6 +8,11 @@ import (
 )
 
 var (
+	createDeviceErrMap = map[domain.ErrorCode]func(*gin.Context, error){
+		domain.ErrDeviceExistsDeleted: func(c *gin.Context, err error) {
+			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+		},
+	}
 	deleteDeviceErrMap = map[domain.ErrorCode]func(*gin.Context, error){
 		domain.ErrDeviceNotFoundCode: func(c *gin.Context, err error) {
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -15,15 +20,21 @@ var (
 		domain.ErrDeviceInUse: func(c *gin.Context, err error) {
 			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 		},
-		domain.ErrDeviceAlreadyDeleted: func(c *gin.Context, err error) {
-			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
-		},
-	}
-	createDeviceErrMap = map[domain.ErrorCode]func(*gin.Context, error){
-		domain.ErrDeviceExistsDeleted: func(c *gin.Context, err error) {
+		domain.ErrDeviceDeleted: func(c *gin.Context, err error) {
 			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 		},
 	}
 	getByExternalIDErrMap = map[domain.ErrorCode]func(*gin.Context, error){}
 	listDevicesErrMap     = map[domain.ErrorCode]func(*gin.Context, error){}
+	updateDeviceErrMap    = map[domain.ErrorCode]func(*gin.Context, error){
+		domain.ErrDeviceInUse: func(c *gin.Context, err error) {
+			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+		},
+		domain.ErrDeviceNotFoundCode: func(c *gin.Context, err error) {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		},
+		domain.ErrDeviceDeleted: func(c *gin.Context, err error) {
+			c.JSON(http.StatusGone, gin.H{"error": err.Error()})
+		},
+	}
 )

@@ -25,7 +25,7 @@ help:
 	@echo "  version    - Display version information for the built binary"
 	@echo "  help       - Show this help message"
 
-.PHONY: run build clean clean-db init-db run-local version
+.PHONY: build clean clean-db init-db run run-local test-integration version
 
 build: clean
 	mkdir -p $(BIN_PATH)
@@ -45,6 +45,9 @@ run: clean build
 
 run-local:
 	$(MAKE) run ENV=local
+
+test-integration:
+	./scripts/test-integration.sh
 
 version:
 	go version -m $(BIN_PATH)/$(BIN_FILENAME)

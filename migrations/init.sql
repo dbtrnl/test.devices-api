@@ -33,7 +33,7 @@ CREATE TRIGGER trg_prevent_created_at_update BEFORE UPDATE ON devices FOR EACH R
 CREATE OR REPLACE FUNCTION prevent_device_inuse_update()
 RETURNS TRIGGER AS $$
 BEGIN
-    IF OLD.state = 'in-use' THEN
+    IF OLD.state = 'in-use' AND NEW.state = 'in-use' THEN
         RAISE EXCEPTION USING MESSAGE = 'err_device_in_use', ERRCODE = 'P1001';
     END IF;
     RETURN NEW;

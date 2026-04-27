@@ -20,6 +20,7 @@ func SetupRoutes(r *gin.Engine, c *deps.Container) error {
 	r.GET("/devices/:external_id", h.GetByExternalID)
 	r.DELETE("/devices/:external_id", h.DeleteByExternalID)
 	r.POST("/devices", h.Create)
+	r.PATCH("/devices/:external_id", h.Update)
 
 	return nil
 }

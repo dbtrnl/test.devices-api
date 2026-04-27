@@ -79,11 +79,9 @@ func (r *deviceRepository) DeleteByExternalID(ctx context.Context, externalID st
 		Model(&domain.Device{}).
 		Where("external_id = ? AND is_deleted = FALSE", externalID).
 		Update("is_deleted", true)
-
 	if err := result.Error; err != nil {
 		return dberrors.Translate(err, externalID)
 	}
-
 	if result.RowsAffected == 1 {
 		return nil
 	}
@@ -104,29 +102,54 @@ func (r *deviceRepository) DeleteByExternalID(ctx context.Context, externalID st
 		return err
 	}
 
-	return domain.NewErrDeviceAlreadyDeleted(externalID)
+	return domain.NewErrDeviceDeleted(externalID)
 }
 
-/* This works, but if deletion is sucessful, returns error like it was already soft-deleted
-func (r *deviceRepository) DeleteByExternalID(ctx context.Context, externalID string) error {
-	var d domain.Device
+func (r *deviceRepository) Update(ctx context.Context, input domain.UpdateDevice) (*domain.Device, error) {
+	var existing domain.Device
 
-	result := r.db.WithContext(ctx).
-		Model(&domain.Device{}).
-		Clauses(clause.Returning{}).
-		Where("external_id = ?", externalID).
-		Update("is_deleted", true).
-		Scan(&d)
+	err := r.db.WithContext(ctx).
+		Where("external_id = ?", input.ExternalID).
+		First(&existing).Error
+	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, domain.NewErrDeviceNotFound(input.ExternalID)
+	}
+	if err != nil {
+		return nil, err
+	}
+	if existing.IsDeleted {
+		return nil, domain.NewErrDeviceDeleted(input.ExternalID)
+	}
+
+	upd, err := updateDeviceValues(existing, input.Name, input.Brand, input.State)
+	if err != nil {
+		return nil, err
+	}
+
+	result := r.db.WithContext(ctx).Save(&upd)
 	if result.Error != nil {
-		return dberrors.Translate(result.Error, externalID)
-	}
-	if result.RowsAffected == 0 {
-		return domain.NewErrDeviceNotFound(externalID)
-	}
-	if d.IsDeleted {
-		return domain.NewErrDeviceAlreadyDeleted(externalID)
+		return nil, dberrors.Translate(result.Error, input.ExternalID)
 	}
 
-	return nil
+	return &upd, nil
 }
-*/
+
+func updateDeviceValues(existingDevice domain.Device, name, brand string, state domain.DeviceState) (domain.Device, error) {
+	// nameBrandIsBeingUpdated := name != "" && brand != ""
+	newStateIsValid := state != domain.DeviceStateInUse
+	deviceIsInUse := existingDevice.State == domain.DeviceStateInUse
+
+	if deviceIsInUse && !newStateIsValid{
+		return domain.Device{}, domain.NewErrDeviceInUse(existingDevice.ExternalID)
+	}
+	if name != "" {
+		existingDevice.Name = name
+	}
+	if brand != "" {
+		existingDevice.Brand = brand
+	}
+	if state != "" {
+		existingDevice.State = state
+	}
+	return existingDevice, nil
+}

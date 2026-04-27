@@ -8,11 +8,11 @@ import (
 type ErrorCode string
 
 const (
-	ErrDeviceNotFoundCode   ErrorCode = "err_device_not_found"
-	ErrDeviceActiveCode     ErrorCode = "err_device_active"
-	ErrDeviceExistsDeleted  ErrorCode = "err_device_exists_deleted"
-	ErrDeviceInUse          ErrorCode = "err_device_in_use"
-	ErrDeviceAlreadyDeleted ErrorCode = "err_device_already_deleted"
+	ErrDeviceNotFoundCode  ErrorCode = "err_device_not_found"
+	ErrDeviceActiveCode    ErrorCode = "err_device_active"
+	ErrDeviceExistsDeleted ErrorCode = "err_device_exists_deleted"
+	ErrDeviceInUse         ErrorCode = "err_device_in_use"
+	ErrDeviceDeleted       ErrorCode = "err_device_deleted"
 )
 
 type AppError struct {
@@ -48,14 +48,14 @@ func NewErrDeviceExistsDeleted(name, brand, uuid string) error {
 func NewErrDeviceInUse(uuid string) error {
 	return &AppError{
 		Code:    ErrDeviceInUse,
-		Message: fmt.Sprintf("device uuid %s is in-use and can't be deleted", uuid),
+		Message: fmt.Sprintf("device uuid %s is in-use", uuid),
 	}
 }
 
-func NewErrDeviceAlreadyDeleted(uuid string) error {
+func NewErrDeviceDeleted(uuid string) error {
 	return &AppError{
-		Code:    ErrDeviceAlreadyDeleted,
-		Message: fmt.Sprintf("device uuid %s is already soft-deleted", uuid),
+		Code:    ErrDeviceDeleted,
+		Message: fmt.Sprintf("device uuid %s is soft-deleted", uuid),
 	}
 }
 
