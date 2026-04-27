@@ -23,7 +23,7 @@ func (h *DeviceHandler) Update(c *gin.Context) {
 		return
 	}
 
-	input, err := dto.NewUpdateDeviceInput(externalID, req.Brand, req.Name, req.State)
+	input, err := dto.NewUpdateDeviceInput(externalID, req.Name, req.Brand, req.State)
 	if !response.HandleValidationError(c, err) {
 		return
 	}

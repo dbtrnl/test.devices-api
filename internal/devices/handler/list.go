@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Tag validations were avoided to keep the logic explicit inside the DTO
 type listDevicesQuery struct {
 	Brand *string `form:"brand"`
 	State *string `form:"state"`

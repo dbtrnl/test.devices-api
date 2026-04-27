@@ -12,7 +12,7 @@ import (
 type createDeviceRequest struct {
 	Name  string `json:"name" binding:"required,min=2"`
 	Brand string `json:"brand" binding:"required,min=2"`
-	State string `json:"state"`
+	State string `json:"state" binding:"required"`
 }
 
 func (h *DeviceHandler) Create(c *gin.Context) {
@@ -27,12 +27,17 @@ func (h *DeviceHandler) Create(c *gin.Context) {
 		return
 	}
 
-	created, err := h.svc.Create(c.Request.Context(), input)
+	created, hasBeenCreated, err := h.svc.Create(c.Request.Context(), input)
 	if err != nil {
 		response.HandleError(c, err, createDeviceErrMap)
 		return
 	}
-
 	response := dto.ToDeviceResponse(created)
-	c.JSON(http.StatusCreated, response)
+
+	if hasBeenCreated {
+		c.JSON(http.StatusCreated, response)
+		return
+	}
+
+	c.JSON(http.StatusOK, response)
 }

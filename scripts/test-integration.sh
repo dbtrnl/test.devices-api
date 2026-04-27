@@ -41,5 +41,5 @@ until curl -s http://localhost:8080/health > /dev/null; do
   sleep 1
 done
 
-printf "${RESET}Running integration tests...\n${BLUE}"
+printf "${RESET}Running integration tests...\n"
 go test -tags=integration ./... -v

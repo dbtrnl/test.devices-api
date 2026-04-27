@@ -13,6 +13,7 @@ const (
 	ErrDeviceExistsDeleted ErrorCode = "err_device_exists_deleted"
 	ErrDeviceInUse         ErrorCode = "err_device_in_use"
 	ErrDeviceDeleted       ErrorCode = "err_device_deleted"
+	ErrDeviceAlreadyExists ErrorCode = "err_device_already_exists"
 )
 
 type AppError struct {
@@ -56,6 +57,13 @@ func NewErrDeviceDeleted(uuid string) error {
 	return &AppError{
 		Code:    ErrDeviceDeleted,
 		Message: fmt.Sprintf("device uuid %s is soft-deleted", uuid),
+	}
+}
+
+func NewErrDeviceAlreadyExists() error {
+	return &AppError{
+		Code:    ErrDeviceAlreadyExists,
+		Message: "device with this name and brand already exists",
 	}
 }
 

@@ -7,7 +7,7 @@ import (
 	"github.com/dbtrnl/test.devices-api/internal/devices/dto"
 )
 
-func (s *DeviceService) Create(ctx context.Context, input dto.CreateDeviceInput) (*domain.Device, error) {
+func (s *DeviceService) Create(ctx context.Context, input dto.CreateDeviceInput) (*domain.Device, bool, error) {
 	device := &domain.Device{
 		Name:  input.Name,
 		Brand: input.Brand,

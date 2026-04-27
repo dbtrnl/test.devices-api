@@ -8,7 +8,7 @@ import (
 
 type deviceRepository interface {
 	GetByExternalID(ctx context.Context, id string) (*domain.Device, error)
-	Create(ctx context.Context, device *domain.Device) (*domain.Device, error)
+	Create(ctx context.Context, device *domain.Device) (*domain.Device, bool, error)
 	List(ctx context.Context, filter domain.DeviceFilter) ([]domain.Device, error)
 	DeleteByExternalID(ctx context.Context, id string) error
 	Update(ctx context.Context, device domain.UpdateDevice) (*domain.Device, error)

@@ -12,6 +12,8 @@ func Translate(err error, externalID string) error {
 		switch dbErr.Code {
 		case "P1001":
 			return domain.NewErrDeviceInUse(externalID)
+		case "23505":
+			return domain.NewErrDeviceAlreadyExists()
 		}
 	}
 

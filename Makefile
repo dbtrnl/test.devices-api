@@ -16,14 +16,15 @@ LDFLAGS = -ldflags "\
 
 help:
 	@echo "Available commands:"
-	@echo "  build      - Build the binary for Linux amd64"
-	@echo "  clean      - Remove the bin directory"
-	@echo "  clean-db   - Stop and remove the PostgreSQL container"
-	@echo "  init-db    - Initialize the PostgreSQL database container"
-	@echo "  run        - Clean, build, and run the binary with the specified ENV"
-	@echo "  run-local  - Run the binary in local environment"
-	@echo "  version    - Display version information for the built binary"
-	@echo "  help       - Show this help message"
+	@echo "  build      		- Build the binary for Linux amd64"
+	@echo "  clean      		- Remove the bin directory"
+	@echo "  clean-db   		- Stop and remove the PostgreSQL container"
+	@echo "  init-db    		- Initialize the PostgreSQL database container"
+	@echo "  run        		- Clean, build, and run the binary with the specified ENV"
+	@echo "  run-local  		- Run the binary in local environment"
+	@echo "  test-integration	- Initializes a local DB, compiles the binary and runs the integration tests"
+	@echo "  version    		- Display version information for the built binary"
+	@echo "  help       		- Show this help message"
 
 .PHONY: build clean clean-db init-db run run-local test-integration version
 

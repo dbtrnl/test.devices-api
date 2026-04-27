@@ -14,7 +14,7 @@ type CreateDeviceInput struct {
 	State domain.DeviceState
 }
 
-type DeleteDeviceInput struct {
+type DeviceUUIDInput struct {
 	ExternalID string
 }
 
@@ -42,7 +42,8 @@ type DeviceResponse struct {
 	IsDeleted  bool    `json:"is_deleted,omitempty"`
 }
 
-func NewCreateDeviceInput(name, brand, state string) (CreateDeviceInput, error) {
+func NewCreateDeviceInput(name, brand string, state string) (CreateDeviceInput, error) {
+	var input CreateDeviceInput
 	if len(name) < 2 {
 		return CreateDeviceInput{}, fmt.Errorf("name must be at least 2 characters")
 	}
@@ -50,16 +51,19 @@ func NewCreateDeviceInput(name, brand, state string) (CreateDeviceInput, error) 
 		return CreateDeviceInput{}, fmt.Errorf("brand must be at least 2 characters")
 	}
 
-	deviceState := domain.DeviceState(state)
-	if deviceState == "" {
-		deviceState = domain.DeviceStateInactive
+	input.Name = name
+	input.Brand = brand
+
+	if state != "" {
+		if !domain.IsValidDeviceState(state) {
+			return CreateDeviceInput{}, fmt.Errorf("invalid state: %s", state)
+		}
+
+		s := domain.DeviceState(state)
+		input.State = s
 	}
 
-	return CreateDeviceInput{
-		Name:  name,
-		Brand: brand,
-		State: deviceState,
-	}, nil
+	return input, nil
 }
 
 func NewListDeviceInput(brand, state *string) (ListDevicesInput, error) {
@@ -80,18 +84,23 @@ func NewListDeviceInput(brand, state *string) (ListDevicesInput, error) {
 	return input, nil
 }
 
-func NewDeleteDeviceInput(uuidStr string) (DeleteDeviceInput, error) {
+func NewDeleteDeviceInput(uuidStr string) (DeviceUUIDInput, error) {
 	err := uuid.Validate(uuidStr)
 	if err != nil {
-		return DeleteDeviceInput{}, fmt.Errorf("invalid uuid: %s", uuidStr)
+		return DeviceUUIDInput{}, fmt.Errorf("invalid uuid: %s", uuidStr)
 	}
 
-	return DeleteDeviceInput{
+	return DeviceUUIDInput{
 		ExternalID: uuidStr,
 	}, nil
 }
 
 func NewUpdateDeviceInput(externalID string, name, brand, state *string) (UpdateDeviceInput, error) {
+	err := uuid.Validate(externalID)
+	if err != nil {
+		return UpdateDeviceInput{}, fmt.Errorf("invalid uuid: %s", externalID)
+	}
+
 	input := UpdateDeviceInput{
 		ExternalID: externalID,
 	}
